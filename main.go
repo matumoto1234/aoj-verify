@@ -98,6 +98,7 @@ func newRunResult(testcaseName string, status runStatus, execTime time.Duration)
 }
 
 func verify(cacheDir, buildFilename string) error {
+	// tmp作って〜
 	tmpDir, err := os.MkdirTemp(".aoj-verify", "tmp")
 	if err != nil {
 		return fmt.Errorf("failed to temporally directory: %w", err)
@@ -106,6 +107,7 @@ func verify(cacheDir, buildFilename string) error {
 
 	binaryFilepath := filepath.Join(tmpDir, "main")
 
+	// Goファイルをビルドして〜
 	var buildCmdStdErr bytes.Buffer
 	buildCmd := exec.Command("go", "build", "-o", binaryFilepath, buildFilename)
 	buildCmd.Stderr = &buildCmdStdErr
@@ -115,6 +117,7 @@ func verify(cacheDir, buildFilename string) error {
 		return fmt.Errorf("failed to build go file: %w\n%s", err, buildCmdStdErr.String())
 	}
 
+	// .in を取得して〜
 	var inFilepaths []string
 	err = filepath.WalkDir(cacheDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -135,6 +138,7 @@ func verify(cacheDir, buildFilename string) error {
 	var runResults []*runResult
 
 	for _, inFilepath := range inFilepaths {
+		// 標準入力に入力ケース渡して実行 & その標準出力と出力ケースを比較してジャッジ
 		base := strings.TrimSuffix(inFilepath, ".in")
 		outFilepath := base + ".out"
 
